@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  # 1. The Application (NEW)
+  app:
+    build: .  # Looks for Dockerfile in current directory
+    container_name: courier_app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - rabbitmq
+    environment:
+      # Override 'localhost' because inside Docker, localhost is the container itself
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/courier_dispatch
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_DATASOURCE_USERNAME: courier
+      SPRING_DATASOURCE_PASSWORD: password
+
+  # 2. Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: courier_db
+    environment:
+      POSTGRES_USER: courier
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: courier_dispatch
+    ports:
+      - "5432:5432"
+
+  # 3. Queue
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: courier_queue
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest

@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: courier-connect
+
+#In prod, use 'validate' and Flyway
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+#Important: We handle retries manually
+  rabbitmq:
+    listener:
+      simple:
+        default-requeue-rejected: false
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/courier_dispatch
+    username: courier
+    password: password
+
+# Tells Flyway: "If the DB has tables but no history, assume it's at version 0 and start migrating."
+  flyway:
+    baseline-on-migrate: true
