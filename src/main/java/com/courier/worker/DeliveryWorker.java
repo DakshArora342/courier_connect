@@ -37,8 +37,13 @@ public class DeliveryWorker {
             log.info("Attempting delivery for Task: {} (Attempt {})", id, task.getAttemptCount() + 1);
 
             // 1. HTTP Request to Client
-            String response = webClient.post().uri(task.getClientUrl()).bodyValue(task.getPayload()).retrieve()
-                    .bodyToMono(String.class).block(); // Blocking here is fine as we are in a background worker
+            String response = webClient.post()
+                    .uri(task.getClientUrl())
+                    .header("Content-Type", "application/json")
+                    .bodyValue(task.getPayload())
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
 
             // 2. Success!
             task.setStatus(DeliveryTask.TaskStatus.COMPLETED);
@@ -55,6 +60,11 @@ public class DeliveryWorker {
     private void handleFailure(DeliveryTask task, String error) {
         int attempts = task.getAttemptCount() + 1;
         task.setAttemptCount(attempts);
+
+        if (error != null && error.length() > 500) {
+            error = error.substring(0, 500); // Truncate to fit database
+        }
+        
         task.setLastErrorMessage(error);
 
         if (attempts >= 5) { // Max Retries
@@ -79,4 +89,5 @@ public class DeliveryWorker {
         }
         repository.save(task);
     }
+
 }
