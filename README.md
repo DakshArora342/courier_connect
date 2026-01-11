@@ -31,9 +31,9 @@ The system follows an **Event-Driven Architecture** to ensure non-blocking opera
 
 ## 🛠 Tech Stack
 
-* **Core:** Java 17, Spring Boot 3
+* **Core:** Java 17, Spring Boot
 * **Messaging:** RabbitMQ (AMQP)
-* **Database:** PostgreSQL 15
+* **Database:** PostgreSQL
 * **Migration:** Flyway (database schema versioning)
 * **Containerization:** Docker & Docker Compose
 * **Documentation:** Swagger UI (OpenAPI)
@@ -108,3 +108,4 @@ mvnw spring-boot:run
 
 
 ---
+
