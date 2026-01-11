@@ -21,7 +21,7 @@ spring:
     baseline-on-migrate: true
 
 # Configuration for Retries
-  courier:
-    retry:
-      max-attempts: 5
-      backoff-multiplier: 1000
+courier:
+  retry:
+    max-attempts: 5
+    backoff-multiplier: 1000
