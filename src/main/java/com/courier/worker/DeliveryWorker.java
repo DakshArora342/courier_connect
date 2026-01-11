@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -23,7 +24,14 @@ public class DeliveryWorker {
 
     private final DeliveryRepository repository;
     private final RabbitTemplate rabbitTemplate;
-    private final WebClient webClient = WebClient.create();
+    private final WebClient webClient;
+
+    // Injected from application.yml
+    @Value("${courier.retry.max-attempts}")
+    private int maxAttempts;
+
+    @Value("${courier.retry.backoff-multiplier}")
+    private long backoffMultiplier;
 
     @RabbitListener(queues = RabbitMQConfig.MAIN_QUEUE)
     public void processDelivery(String taskId) {
@@ -64,7 +72,7 @@ public class DeliveryWorker {
         if (error != null && error.length() > 500) {
             error = error.substring(0, 500); // Truncate to fit database
         }
-        
+
         task.setLastErrorMessage(error);
 
         if (attempts >= 5) { // Max Retries
