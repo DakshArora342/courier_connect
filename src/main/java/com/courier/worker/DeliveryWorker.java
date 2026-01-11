@@ -75,7 +75,7 @@ public class DeliveryWorker {
 
         task.setLastErrorMessage(error);
 
-        if (attempts >= 5) { // Max Retries
+        if (attempts >= maxAttempts) { // Max Retries
             task.setStatus(DeliveryTask.TaskStatus.FAILED);
             log.error("Task {} FAILED completely after {} attempts.", task.getId(), attempts);
         } else {
@@ -83,7 +83,7 @@ public class DeliveryWorker {
 
             // EXPONENTIAL BACKOFF LOGIC
             // 2^1 = 2s, 2^2 = 4s, 2^3 = 8s
-            long delayMs = (long) Math.pow(2, attempts) * 1000;
+            long delayMs = (long) Math.pow(2, attempts) * backoffMultiplier;
             task.setNextRetryAt(LocalDateTime.now().plus(Duration.ofMillis(delayMs)));
 
             log.warn("Task {} failed. Retrying in {} ms", task.getId(), delayMs);
