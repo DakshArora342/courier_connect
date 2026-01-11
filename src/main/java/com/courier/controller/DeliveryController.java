@@ -13,6 +13,7 @@ import com.courier.entity.DeliveryTask;
 import com.courier.repository.DeliveryRepository;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -25,7 +26,7 @@ public class DeliveryController {
 
     @Operation(summary = "Dispatch a Webhook", description = "Accepts a delivery request and processes it asynchronously")
     @PostMapping
-    public ResponseEntity<String> createDelivery(@RequestBody DeliveryRequest request) {
+    public ResponseEntity<String> createDelivery(@Valid @RequestBody DeliveryRequest request) {
         // 1. Save to DB (PENDING)
         DeliveryTask task = DeliveryTask.builder().clientUrl(request.url()).payload(request.payload())
                 .status(DeliveryTask.TaskStatus.PENDING).attemptCount(0).build();
