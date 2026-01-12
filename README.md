@@ -1,3 +1,5 @@
+---
+
 # Courier Connect 📨
 
 A robust, fault-tolerant webhook delivery service built with **Spring Boot** and **RabbitMQ**.
@@ -18,5 +20,56 @@ Courier Connect decouples the ingestion of tasks from their delivery. It ensures
 * **Language:** Java 17
 * **Framework:** Spring Boot
 * **Messaging:** RabbitMQ (Exchanges, Queues, DLQ)
-* **Database:** [PostgreSQL / MySQL] with Spring Data JPA
+* **Database:** PostgreSQL with Spring Data JPA
 * **Build:** Maven
+
+---
+
+## 🚀 Quick Start
+
+### Option 1: Docker (Recommended)
+
+Run the entire infrastructure (Application + Database + Queue):
+
+```bash
+docker-compose up --build
+```
+
+* **Swagger Docs:** `http://localhost:8080/swagger-ui.html`
+
+---
+
+### Option 2: Local Development
+
+Run the Java application locally while keeping infrastructure in Docker.
+
+#### 1. Start Infrastructure
+
+```bash
+docker-compose up postgres rabbitmq
+```
+
+#### 2. Run Application
+
+```bash
+mvnw spring-boot:run
+```
+
+---
+
+## 🔌 API Usage
+
+### Send a Delivery Request
+
+> **Note:** The `payload` must be a **stringified JSON object**.
+
+**POST** `/api/deliveries`
+
+```json
+{
+  "url": "https://webhook.site/destination",
+  "payload": "{\"name\":\"test\",\"salary\":\"123\",\"age\":\"23\"}"
+}
+```
+
+---
