@@ -16,12 +16,39 @@ Courier Connect decouples the ingestion of tasks from their delivery. It ensures
 * **Dead Letter Queue (DLQ):** Messages that fail after maximum attempts are not deleted; they are moved to a DLQ for manual inspection and debugging.
 * **Reactive Client:** Utilizes `Spring WebClient` for efficient, non-blocking HTTP requests.
 
+![Courier Connect webhook delivery architecture with RabbitMQ, DLQ, and retry mechanism](https://i.ibb.co/GQJs6wDy/Screenshot-2026-01-15-203739.png)
+
 ### 🏗️ Tech Stack
 * **Language:** Java 17
 * **Framework:** Spring Boot
 * **Messaging:** RabbitMQ (Exchanges, Queues, DLQ)
 * **Database:** PostgreSQL with Spring Data JPA
 * **Build:** Maven
+
+---
+
+## 📸 Proof of Resilience (Chaos Engineering)
+
+To prove the system’s fault tolerance, a **ChaosController** was implemented that intentionally fails **70% of delivery attempts**. This simulates real-world scenarios such as unstable downstream services or intermittent network failures.
+
+The logs below demonstrate the **Exponential Backoff retry mechanism** in action.
+
+**Retry intervals:**
+`2s → 4s → 8s → 16s`
+
+```
+INFO [Worker] - Attempt 1 failed. Retrying in 2 seconds...
+INFO [Worker] - Attempt 2 failed. Retrying in 4 seconds...
+INFO [Worker] - Attempt 3 failed. Retrying in 8 seconds...
+INFO [Worker] - Attempt 4 success! Delivery confirmed.
+```
+
+This confirms that:
+
+* The ingestion API remains responsive
+* Failed deliveries are retried automatically
+* The system recovers gracefully once the downstream service becomes available
+* Messages exceeding retry limits are routed to the **Dead Letter Queue (DLQ)**
 
 ---
 
